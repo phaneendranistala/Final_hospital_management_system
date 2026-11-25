@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="alternate icon" href="favicon.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediCare HMS - Live Executive Operations Dashboard</title>
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css?v=9.2">
+</head>
+<body>
+    <div class="ambient-background">
+        <canvas id="liveWallpaperCanvas"></canvas>
+        <div class="ambient-orb orb-1"></div>
+        <div class="ambient-orb orb-2"></div>
+        <div class="ambient-orb orb-3"></div>
+        <div class="ambient-grid"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Glass Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-hospital brand-icon"></i>
+                <h2>MediCare HMS</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item active"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
+                <a href="emergency.html" class="nav-item" style="color: #ef4444;"><i class="fas fa-truck-medical" style="color: #ef4444;"></i><span>Emergency / ICU</span></a>
+                <a href="telemedicine.html" class="nav-item" style="color: #38bdf8;"><i class="fas fa-video" style="color: #38bdf8;"></i><span>Telemedicine</span></a>
+                <a href="blood-bank.html" class="nav-item" style="color: #f43f5e;"><i class="fas fa-hand-holding-droplet" style="color: #f43f5e;"></i><span>Blood Bank</span></a>
+                <a href="patients.html" class="nav-item"><i class="fas fa-user-injured"></i><span>Patients</span></a>
+                <a href="doctors.html" class="nav-item"><i class="fas fa-user-md"></i><span>Doctors</span></a>
+                <a href="appointments.html" class="nav-item"><i class="fas fa-calendar-check"></i><span>Appointments</span></a>
+                <a href="prescriptions.html" class="nav-item"><i class="fas fa-prescription"></i><span>Prescriptions</span></a>
+                <a href="laboratory.html" class="nav-item"><i class="fas fa-flask"></i><span>Laboratory</span></a>
+                <a href="pharmacy.html" class="nav-item"><i class="fas fa-pills"></i><span>Pharmacy</span></a>
+                <a href="billing.html" class="nav-item"><i class="fas fa-file-invoice-dollar"></i><span>Billing</span></a>
+                <a href="admin.html" class="nav-item"><i class="fas fa-cogs"></i><span>Administration</span></a>
+                <a href="patient-portal.html" class="nav-item" style="color: #38bdf8;"><i class="fas fa-id-badge" style="color: #38bdf8;"></i><span>Patient Portal</span></a>
+                <a href="slides.html" target="_blank" class="nav-item" style="color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.25); background: rgba(56, 189, 248, 0.08);"><i class="fas fa-file-powerpoint" style="color: #38bdf8;"></i><span>Presentation</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="index.html" class="nav-item"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Glass Header HUD -->
+            <header class="header">
+                <div class="header-left">
+                    <button class="btn-icon sidebar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar"><i class="fas fa-bars"></i></button>
+                    <div>
+                        <h1 style="font-size: 1.35rem; font-weight: 700;">Executive Dashboard</h1>
+                        <span style="font-size: 0.76rem; color: var(--text-muted); font-family: 'JetBrains Mono';">MediCare Super Specialty Health System</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <!-- Quick Command Search Pill -->
+                    <div class="header-search-pill" onclick="toggleCommandPalette(true)" title="Universal Search & Actions (Ctrl + K)">
+                        <i class="fas fa-search" style="font-size: 0.8rem; color: var(--primary);"></i>
+                        <span>Search System</span>
+                        <kbd>Ctrl K</kbd>
+                    </div>
+
+                    <!-- Live Emergency Status -->
+                    <div class="live-emergency-ticker">
+                        <i class="fas fa-heartbeat"></i> <span>EMERGENCY: 100% OPERATIONAL</span>
+                    </div>
+
+                    <!-- Live Digital Clock & Calendar -->
+                    <div class="live-clock-widget">
+                        <span class="clock-dot"></span>
+                        <span class="clock-time" id="liveTime">--:--:--</span>
+                        <span style="opacity:0.4;">|</span>
+                        <span class="clock-date" id="liveDate">---</span>
+                    </div>
+
+                    <!-- Interactive HUD Action Buttons -->
+                    <button class="btn-icon notification-bell-btn" onclick="toggleNotificationCenter()" title="Notifications & Clinical Alerts">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <button class="btn-icon sound-toggle" onclick="toggleSound()" title="Toggle UI Audio Feedback"><i class="fas fa-volume-up"></i></button>
+                    <button class="btn-icon wallpaper-toggle" onclick="cycleWallpaperMode()" title="Switch Interactive Live Wallpaper"><i class="fas fa-magic"></i></button>
+                    <button class="btn-icon theme-toggle" onclick="toggleTheme()" title="Switch Glass Theme"><i class="fas fa-moon"></i></button>
+
+                    <!-- React 18 Architecture Badge Mount -->
+                    <div id="react-badge-mount"></div>
+
+                    <div class="user-info">
+                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22128%22%20height%3D%22128%22%20viewBox%3D%220%200%20128%20128%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230284c7%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230f172a%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22128%22%20height%3D%22128%22%20rx%3D%2228%22%20fill%3D%22url(%23g)%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2254%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20fill%3D%22%23ffffff%22%20font-family%3D%22system-ui%2Csans-serif%22%20font-size%3D%2248%22%20font-weight%3D%22800%22%3EAD%3C%2Ftext%3E%3C%2Fsvg%3E" alt="User Avatar" class="avatar">
+                        <div>
+                            <strong style="font-size: 0.88rem; display: block; line-height: 1.2;">Dr. Admin</strong>
+                            <span style="font-size: 0.72rem; color: var(--text-muted); font-family: 'JetBrains Mono';">Super User</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="content-wrapper">
+                <!-- Live KPI Metric Cards -->
+                <div id="dashboardLivePulseStrip" class="card" style="padding: 12px 18px; margin-bottom: 18px; border: 1px solid rgba(56, 189, 248, 0.25);"></div>
+                <div class="stats-grid">
+                    <div class="stat-card blue">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-details">
+                            <h3 class="stat-number" id="totalPatients">0</h3>
+                            <p class="stat-label">Total Registered Patients</p>
+                        </div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+                        <div class="stat-details">
+                            <h3 class="stat-number" id="todayAppointments">0</h3>
+                            <p class="stat-label">Today's Consultations</p>
+                        </div>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="stat-icon"><i class="fas fa-rupee-sign"></i></div>
+                        <div class="stat-details">
+                            <h3 class="stat-number" id="totalRevenue">₹0</h3>
+                            <p class="stat-label">Collected Clinical Revenue</p>
+                        </div>
+                    </div>
+                    <div class="stat-card red">
+                        <div class="stat-icon"><i class="fas fa-bed"></i></div>
+                        <div class="stat-details">
+                            <h3 class="stat-number" id="availableBeds">0</h3>
+                            <p class="stat-label">Available Inpatient Beds</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Data Visualizations Section -->
+                <div class="dashboard-charts-grid">
+                    <!-- 7-Day Patient Volume Trend -->
+                    <div class="chart-card">
+                        <div class="chart-card-header">
+                            <div>
+                                <h3 class="chart-card-title"><i class="fas fa-chart-area" style="color:var(--primary);"></i> 7-Day Patient Volume & Admission Flow</h3>
+                                <p style="font-size:0.76rem; color:var(--text-muted); margin-top:2px;">Real-time inpatient admissions vs outpatient consultations</p>
+                            </div>
+                            <div class="chart-legend">
+                                <div class="legend-item"><span class="legend-dot outpatient"></span> Outpatient</div>
+                                <div class="legend-item"><span class="legend-dot inpatient"></span> Inpatient</div>
+                            </div>
+                        </div>
+                        <div class="chart-canvas-container">
+                            <canvas id="patientFlowCanvas" class="chart-canvas"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Real-Time Bed Occupancy Donut -->
+                    <div class="chart-card">
+                        <div class="chart-card-header">
+                            <div>
+                                <h3 class="chart-card-title"><i class="fas fa-procedures" style="color:var(--success);"></i> Bed Capacity Breakdown</h3>
+                                <p style="font-size:0.76rem; color:var(--text-muted); margin-top:2px;">ICU, Emergency, and Inpatient Wards</p>
+                            </div>
+                        </div>
+                        <div class="chart-canvas-container" style="display:flex; justify-content:center; align-items:center;">
+                            <canvas id="bedOccupancyCanvas" class="chart-canvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FACILITY 3: SMART VISUAL HOSPITAL BED & WARD MANAGEMENT FLOOR PLAN -->
+                <div class="card" style="margin-top: 24px; border: 1px solid rgba(56, 189, 248, 0.35);">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(56, 189, 248, 0.2); border: 1px solid var(--primary); display: flex; align-items: center; justify-content: center; color: var(--primary);">
+                                    <i class="fas fa-hospital-user"></i>
+                                </div>
+                                <div>
+                                    <h3 class="card-title" style="margin: 0; font-size: 1.12rem;">Smart Visual Hospital Bed & Ward Management Floor Plan</h3>
+                                    <p style="font-size: 0.76rem; color: var(--text-muted); margin: 2px 0 0 0;">Interactive 2D Ward Matrix • Real-Time Occupancy • 1-Click Bed Allocation & Transfer</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <button class="btn btn-sm btn-outline" onclick="openBedAllocationModal()">
+                                <i class="fas fa-bed-pulse"></i> 1-Click Bed Allocation
+                            </button>
+                            <button class="btn btn-sm btn-primary" onclick="openPatientTransferModal()">
+                                <i class="fas fa-right-left"></i> Transfer Patient
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Ward & Wing Tabs + Bed Status Legend Bar -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--glass-border);">
+                        <!-- Wing Filter Pills -->
+                        <div class="bed-wing-pills" id="bedWingPills" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button class="btn-wing-pill active" data-wing="all" onclick="filterBedFloorPlan('all', this)">All Wings (18)</button>
+                            <button class="btn-wing-pill" data-wing="ICU" onclick="filterBedFloorPlan('ICU', this)"><i class="fas fa-lungs"></i> ICU</button>
+                            <button class="btn-wing-pill" data-wing="CCU" onclick="filterBedFloorPlan('CCU', this)"><i class="fas fa-heart-pulse"></i> Cardiac CCU</button>
+                            <button class="btn-wing-pill" data-wing="Pediatric" onclick="filterBedFloorPlan('Pediatric', this)"><i class="fas fa-child"></i> Pediatric</button>
+                            <button class="btn-wing-pill" data-wing="Emergency" onclick="filterBedFloorPlan('Emergency', this)"><i class="fas fa-truck-medical"></i> ER Bays</button>
+                            <button class="btn-wing-pill" data-wing="General" onclick="filterBedFloorPlan('General', this)"><i class="fas fa-bed"></i> General Ward</button>
+                            <button class="btn-wing-pill" data-wing="Executive" onclick="filterBedFloorPlan('Executive', this)"><i class="fas fa-crown"></i> Executive Suites</button>
+                        </div>
+
+                        <!-- Status Legend Pills -->
+                        <div style="display: flex; gap: 10px; align-items: center; font-size: 0.75rem; flex-wrap: wrap;">
+                            <span class="bed-status-pill occupied"><i class="fas fa-circle-dot"></i> Occupied</span>
+                            <span class="bed-status-pill available"><i class="fas fa-circle-check"></i> Available</span>
+                            <span class="bed-status-pill sanitizing"><i class="fas fa-spray-can-sparkles"></i> Sanitizing</span>
+                            <span class="bed-status-pill maintenance"><i class="fas fa-wrench"></i> Maintenance</span>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Bed Matrix Grid -->
+                    <div class="bed-floorplan-grid" id="dashboardBedGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; margin-top: 18px;">
+                        <!-- Rendered dynamically by js/app.js -->
+                    </div>
+                </div>
+
+                <!-- Consultations & Department Roster Grid -->
+                <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; margin-top: 24px;">
+                    <!-- Recent Appointments -->
+                    <div class="card" style="margin-bottom: 0;">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-history" style="color:var(--primary);"></i> Recent Consultations & Appointments</h3>
+                            <a href="appointments.html" class="btn btn-sm btn-outline">View All</a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Patient</th>
+                                        <th>Consultant Doctor</th>
+                                        <th>Date</th>
+                                        <th>Slot</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentAppointments">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Department Clinical Breakdown -->
+                    <div class="card" style="margin-bottom: 0;">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-hospital-user" style="color:var(--primary);"></i> Department Roster & Strength</h3>
+                            <a href="doctors.html" class="btn btn-sm btn-outline">Physicians</a>
+                        </div>
+                        <div id="departmentStats">
+                            <!-- Populated by JS with glowing progress bars -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- React 18 Real-Time ICU Telemetry Waveform Monitor Mount -->
+                <div id="react-telemetry-mount" style="margin-top: 24px;"></div>
+
+                <!-- Live Environmental Telemetry & Quick Action Dock -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px;">
+                    <!-- Live Operations Event Stream -->
+                    <div class="card" style="margin-bottom: 0;">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-satellite-dish" style="color:var(--success);"></i> Live Operational Event Stream</h3>
+                            <span class="badge badge-success"><i class="fas fa-circle" style="font-size:0.5rem; margin-right:4px;"></i> LIVE</span>
+                        </div>
+                        <div id="liveOpsStream" class="live-ops-stream">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions Grid -->
+                    <div class="card" style="margin-bottom: 0;">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-bolt" style="color:var(--warning);"></i> Clinical Operations Quick Action Dock</h3>
+                        </div>
+                        <div class="quick-actions-grid" style="margin-top: 10px;">
+                            <a href="patients.html?action=new" class="quick-action-btn"><i class="fas fa-user-plus" style="color:var(--primary);"></i> Register Patient</a>
+                            <button class="quick-action-btn" onclick="bookAppointment()"><i class="fas fa-calendar-plus" style="color:var(--success);"></i> Schedule Appointment</button>
+                            <button class="quick-action-btn" onclick="createInvoice()"><i class="fas fa-file-invoice" style="color:var(--warning);"></i> Generate Invoice</button>
+                            <button class="quick-action-btn" onclick="addPrescription()"><i class="fas fa-prescription-bottle-alt" style="color:var(--accent);"></i> New Digital Rx</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Engineering Team Card -->
+                <div class="card" style="margin-top: 24px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 16px; padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                        <div>
+                            <div style="font-size: 11px; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 4px;">
+                                <i class="fas fa-graduation-cap"></i> Frontend Web Engineering Project
+                            </div>
+                            <h3 style="font-size: 1.15rem; font-weight: 700; color: #ffffff; margin: 0;">MediCare Project Development Team</h3>
+                        </div>
+                        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                            <!-- Team Lead -->
+                            <div style="background: rgba(37, 99, 235, 0.2); border: 1px solid var(--primary); padding: 8px 16px; border-radius: 10px; display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-crown" style="color: #f59e0b; font-size: 16px;"></i>
+                                <div>
+                                    <span style="font-size: 9.5px; font-weight: 700; color: #38bdf8; text-transform: uppercase; display: block;">Team Lead</span>
+                                    <strong style="font-size: 12.5px; color: #ffffff;">NISTALA SAI PHANEENDRA KUMAR</strong>
+                                </div>
+                            </div>
+                            <!-- Member 1 -->
+                            <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.12); padding: 8px 14px; border-radius: 10px; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-user-check" style="color: #10b981; font-size: 14px;"></i>
+                                <div>
+                                    <span style="font-size: 9.5px; font-weight: 700; color: #10b981; text-transform: uppercase; display: block;">Team Member</span>
+                                    <strong style="font-size: 12px; color: #ffffff;">KANASANI NEELAKANTA BALAJI</strong>
+                                </div>
+                            </div>
+                            <!-- Member 2 -->
+                            <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.12); padding: 8px 14px; border-radius: 10px; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-user-check" style="color: #a855f7; font-size: 14px;"></i>
+                                <div>
+                                    <span style="font-size: 9.5px; font-weight: 700; color: #a855f7; text-transform: uppercase; display: block;">Team Member</span>
+                                    <strong style="font-size: 12px; color: #ffffff;">JAMMULA UDAY KIRAN</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL: 1-Click Bed Allocation -->
+    <div class="modal-overlay" id="bedAllocationModal" style="display: none;">
+        <div class="modal" style="max-width: 520px;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-bed-pulse" style="color: var(--primary); font-size: 20px;"></i>
+                    <h3 style="margin: 0; font-size: 1.15rem;">1-Click Inpatient Bed Allocation</h3>
+                </div>
+                <button class="btn-icon" onclick="closeModal('bedAllocationModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="event.preventDefault(); submitBedAllocation();">
+                    <div class="form-group">
+                        <label class="form-label">Selected Inpatient Bed *</label>
+                        <select id="allocBedSelect" class="form-control form-select" required>
+                            <!-- Populated with available beds -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Admitted Patient *</label>
+                        <select id="allocPatientSelect" class="form-control form-select" required>
+                            <!-- Populated with admitted patients -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Clinical Admission Reason / Department Notes</label>
+                        <input type="text" id="allocNotes" class="form-control" placeholder="e.g. Post-Op surgical observation, Glycemic stabilization" value="Urgent Clinical Stabilization">
+                    </div>
+                    <div class="modal-footer" style="padding-bottom: 0; padding-right: 0;">
+                        <button type="button" class="btn btn-outline" onclick="closeModal('bedAllocationModal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Allocate Bed & Sync</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: 1-Click Patient Bed Transfer -->
+    <div class="modal-overlay" id="patientTransferModal" style="display: none;">
+        <div class="modal" style="max-width: 540px;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-right-left" style="color: #38bdf8; font-size: 20px;"></i>
+                    <h3 style="margin: 0; font-size: 1.15rem;">1-Click Patient Bed & Ward Transfer</h3>
+                </div>
+                <button class="btn-icon" onclick="closeModal('patientTransferModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="event.preventDefault(); submitPatientTransfer();">
+                    <div class="form-group">
+                        <label class="form-label">Current Occupied Bed & Patient *</label>
+                        <select id="transferSourceBedSelect" class="form-control form-select" required>
+                            <!-- Populated with occupied beds -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Destination Bed (Target Wing) *</label>
+                        <select id="transferTargetBedSelect" class="form-control form-select" required>
+                            <!-- Populated with available beds -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Clinical Justification for Transfer *</label>
+                        <select id="transferReasonSelect" class="form-control form-select" required>
+                            <option value="Escalation to Intensive Care Unit (ICU)">Escalation to Intensive Care Unit (ICU)</option>
+                            <option value="Step-down from ICU to General Ward">Step-down from ICU to General Ward</option>
+                            <option value="Transfer to Cardiac Care Unit (CCU)">Transfer to Cardiac Care Unit (CCU)</option>
+                            <option value="Transition to Pediatric Specialized Pavilion">Transition to Pediatric Specialized Pavilion</option>
+                            <option value="Upgrade to Executive Presidential Sky Suite">Upgrade to Executive Presidential Sky Suite</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer" style="padding-bottom: 0; padding-right: 0;">
+                        <button type="button" class="btn btn-outline" onclick="closeModal('patientTransferModal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);"><i class="fas fa-arrow-right-arrow-left"></i> Execute Transfer & Broadcast</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Bed Details & Direct Bed Actions -->
+    <div class="modal-overlay" id="bedDetailsModal" style="display: none;">
+        <div class="modal" style="max-width: 480px;">
+            <div class="modal-header">
+                <h3 style="margin: 0; font-size: 1.15rem;" id="bedDetailTitle">Bed Details</h3>
+                <button class="btn-icon" onclick="closeModal('bedDetailsModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="bedDetailContent">
+                <!-- Rendered dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+    <!-- React 18 Mount Points & Component Bundle -->
+    <div id="react-assistant-mount"></div>
+    <script src="js/react-components.bundle.js"></script>
+    <script src="js/app.js?v=9.2"></script>
+</body>
+</html>

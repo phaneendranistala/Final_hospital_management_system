@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="alternate icon" href="favicon.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediCare HMS - Laboratory & Pathology Diagnostics</title>
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css?v=9.2">
+</head>
+<body>
+    <div class="ambient-background">
+        <div class="ambient-orb orb-1"></div>
+        <div class="ambient-orb orb-2"></div>
+        <div class="ambient-orb orb-3"></div>
+        <div class="ambient-grid"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-hospital brand-icon"></i>
+                <h2>MediCare HMS</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
+                <a href="emergency.html" class="nav-item" style="color: #ef4444;"><i class="fas fa-truck-medical" style="color: #ef4444;"></i><span>Emergency / ICU</span></a>
+                <a href="telemedicine.html" class="nav-item" style="color: #38bdf8;"><i class="fas fa-video" style="color: #38bdf8;"></i><span>Telemedicine</span></a>
+                <a href="blood-bank.html" class="nav-item" style="color: #f43f5e;"><i class="fas fa-hand-holding-droplet" style="color: #f43f5e;"></i><span>Blood Bank</span></a>
+                <a href="patients.html" class="nav-item"><i class="fas fa-user-injured"></i><span>Patients</span></a>
+                <a href="doctors.html" class="nav-item"><i class="fas fa-user-md"></i><span>Doctors</span></a>
+                <a href="appointments.html" class="nav-item"><i class="fas fa-calendar-check"></i><span>Appointments</span></a>
+                <a href="prescriptions.html" class="nav-item"><i class="fas fa-prescription"></i><span>Prescriptions</span></a>
+                <a href="laboratory.html" class="nav-item active"><i class="fas fa-flask"></i><span>Laboratory</span></a>
+                <a href="pharmacy.html" class="nav-item"><i class="fas fa-pills"></i><span>Pharmacy</span></a>
+                <a href="billing.html" class="nav-item"><i class="fas fa-file-invoice-dollar"></i><span>Billing</span></a>
+                <a href="admin.html" class="nav-item"><i class="fas fa-cogs"></i><span>Administration</span></a>
+                <a href="patient-portal.html" class="nav-item" style="color: #38bdf8;"><i class="fas fa-id-badge" style="color: #38bdf8;"></i><span>Patient Portal</span></a>
+                <a href="slides.html" target="_blank" class="nav-item" style="color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.25); background: rgba(56, 189, 248, 0.08);"><i class="fas fa-file-powerpoint" style="color: #38bdf8;"></i><span>Presentation</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="index.html" class="nav-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header HUD -->
+            <header class="header">
+                <div class="header-left">
+                    <button class="btn-icon sidebar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar"><i class="fas fa-bars"></i></button>
+                    <div>
+                        <h1 style="font-size: 1.35rem; font-weight: 700;">Laboratory & Diagnostics Hub</h1>
+                        <span style="font-size: 0.76rem; color: var(--text-muted); font-family: 'JetBrains Mono';">Pathology, Radiology & Clinical Chemistry</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="header-search-pill" onclick="toggleCommandPalette(true)" title="Universal Search & Actions (Ctrl + K)">
+                        <i class="fas fa-search" style="font-size: 0.8rem; color: var(--primary);"></i>
+                        <span>Search</span>
+                        <kbd>Ctrl K</kbd>
+                    </div>
+                    <div class="live-emergency-ticker">
+                        <i class="fas fa-microscope"></i> <span>LAB: SPECIMEN PIPELINE ACTIVE</span>
+                    </div>
+                    <div class="live-clock-widget">
+                        <span class="clock-dot"></span>
+                        <span class="clock-time" id="liveTime">--:--:--</span>
+                        <span style="opacity:0.4;">|</span>
+                        <span class="clock-date" id="liveDate">---</span>
+                    </div>
+                    <button class="btn-icon notification-bell-btn" onclick="toggleNotificationCenter()" title="Notifications & Alerts"><i class="fas fa-bell"></i></button>
+                    <button class="btn-icon sound-toggle" onclick="toggleSound()" title="Toggle Audio Feedback"><i class="fas fa-volume-up"></i></button>
+                    <button class="btn-icon wallpaper-toggle" onclick="cycleWallpaperMode()" title="Switch Wallpaper"><i class="fas fa-magic"></i></button>
+                    <button class="btn-icon theme-toggle" onclick="toggleTheme()" title="Switch Glass Theme"><i class="fas fa-moon"></i></button>
+                    <!-- React 18 Architecture Badge Mount -->
+                    <div id="react-badge-mount"></div>
+                    <div class="user-info" id="globalUserBadge">
+                        <!-- Injected dynamically -->
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <!-- Role Scoped Banner (Shown for Doctors or Techs) -->
+                <div id="labRoleBanner" style="display: none;"></div>
+
+                <!-- KPI Metric Cards -->
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); margin-bottom: 24px;">
+                    <div class="stat-card blue">
+                        <div class="stat-icon"><i class="fas fa-vial"></i></div>
+                        <div class="stat-details">
+                            <h3 class="stat-number" id="labTotalTests">0</h3>
+                            <p class="stat-label">Total Diagnostic Orders</p>
+                        </div>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
+                        <div class="stat-details">
+                            <h3 class="stat-number" id="labPendingTests">0</h3>
+                            <p class="stat-label">Specimens In Processing</p>
+                        </div>
+                    </div>
+                    <div class="stat-card red">
+                        <div class="stat-icon"><i class="fas fa-triangle-exclamation"></i></div>
+                        <div class="stat-details">
+                            <h3 class="stat-number" id="labCriticalTests">0</h3>
+                            <p class="stat-label">Critical Alerts Triggered</p>
+                        </div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-icon"><i class="fas fa-circle-check"></i></div>
+                        <div class="stat-details">
+                            <h3 class="stat-number" id="labCompletedTests">0</h3>
+                            <p class="stat-label">Completed & Verified</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions Bar -->
+                <div class="actions-bar" style="flex-wrap: wrap; gap: 12px;">
+                    <div class="search-box" style="flex: 1; min-width: 260px;">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="labSearch" placeholder="Search tests by patient, test name, ID, specimen..." oninput="filterLabTests()">
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <select id="labStatusFilter" class="form-control" style="width: auto; padding: 8px 14px;" onchange="filterLabTests()">
+                            <option value="">All Statuses</option>
+                            <option value="Ordered">Ordered (New)</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                        <select id="labPriorityFilter" class="form-control" style="width: auto; padding: 8px 14px;" onchange="filterLabTests()">
+                            <option value="">All Priorities</option>
+                            <option value="Routine">Routine</option>
+                            <option value="Urgent">Urgent</option>
+                            <option value="STAT">STAT / Emergency</option>
+                        </select>
+                        <button class="btn btn-outline" onclick="exportLabTestsToCSV()" title="Export Laboratory Records to CSV">
+                            <i class="fas fa-file-csv"></i> Export CSV
+                        </button>
+                        <button class="btn btn-primary" onclick="showOrderLabTestModal()">
+                            <i class="fas fa-plus"></i> Order Lab Test
+                        </button>
+                    </div>
+                </div>
+
+                <!-- AI Radiology Neural Vision Scanner (Chest X-Ray Grad-CAM Heatmap) -->
+                <div class="card" style="margin-bottom: 28px; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(56, 189, 248, 0.25); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 25px rgba(14, 165, 233, 0.15);">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(14, 165, 233, 0.2); border: 1px solid #0ea5e9; display: flex; align-items: center; justify-content: center; color: #38bdf8; font-size: 1.1rem;">
+                                <i class="fas fa-x-ray"></i>
+                            </div>
+                            <div>
+                                <h3 class="card-title" style="margin: 0; color: #ffffff;"><i class="fas fa-brain" style="color: #38bdf8; margin-right: 6px;"></i> Chest X-Ray AI Heatmap Diagnostic Scanner</h3>
+                                <div style="font-size: 0.76rem; color: #94a3b8; margin-top: 2px;">Deep Residual CNN • Grad-CAM Attention Heatmaps • Thoracic Pathology Triage</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                            <span class="badge badge-success"><span class="clock-dot"></span> Neural Engine v4.2 Ready</span>
+                            <button class="btn btn-sm btn-outline" onclick="triggerXRayInferenceScan()" title="Re-scan and run AI Grad-CAM inference">
+                                <i class="fas fa-microchip" style="color: #38bdf8;"></i> Re-Scan AI
+                            </button>
+                            <button class="btn btn-sm btn-primary" onclick="exportRadiologyReport()" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); border-color: #0284c7;">
+                                <i class="fas fa-file-medical"></i> Export AI Report
+                            </button>
+                        </div>
+                    </div>
+                    <div style="padding: 20px;">
+                        <!-- Preset selector chips & Custom upload strip -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; background: rgba(30, 41, 59, 0.5); padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.08);">
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <span style="font-size: 0.78rem; font-weight: 700; color: #cbd5e1;"><i class="fas fa-folder-open" style="color: #38bdf8; margin-right: 4px;"></i> Demo Cases:</span>
+                                <button type="button" class="btn btn-sm" id="cxrCaseNormalBtn" onclick="loadXRayCase('normal')" style="background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #34d399; font-size: 0.75rem;">
+                                    Case 1: Normal CXR
+                                </button>
+                                <button type="button" class="btn btn-sm" id="cxrCasePneumoniaBtn" onclick="loadXRayCase('pneumonia')" style="background: #0ea5e9; border: 1px solid #0284c7; color: #ffffff; font-size: 0.75rem; font-weight: 700;">
+                                    Case 2: Lobar Pneumonia
+                                </button>
+                                <button type="button" class="btn btn-sm" id="cxrCaseCardiomegalyBtn" onclick="loadXRayCase('cardiomegaly')" style="background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #f87171; font-size: 0.75rem;">
+                                    Case 3: Cardiomegaly
+                                </button>
+                                <button type="button" class="btn btn-sm" id="cxrCaseEffusionBtn" onclick="loadXRayCase('effusion')" style="background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; color: #fbbf24; font-size: 0.75rem;">
+                                    Case 4: Pleural Effusion
+                                </button>
+                            </div>
+
+                            <!-- Custom File Upload Trigger -->
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <label for="cxrFileInput" class="btn btn-sm btn-outline" style="cursor: pointer; font-size: 0.75rem; margin: 0; display: inline-flex; align-items: center; gap: 6px;">
+                                    <i class="fas fa-cloud-arrow-up" style="color: #38bdf8;"></i> Upload Judge X-Ray
+                                </label>
+                                <input type="file" id="cxrFileInput" accept="image/*" style="display: none;" onchange="handleJudgeXRayUpload(event)">
+                            </div>
+                        </div>
+
+                        <!-- Scanner Body: Dual Canvases (Left) & AI Diagnostic Classification Matrix (Right) -->
+                        <div style="display: grid; grid-template-columns: 360px 1fr; gap: 20px; align-items: start;">
+                            <!-- Left: Interactive Radiograph & Heatmap Canvas Display -->
+                            <div style="background: #030712; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 14px; padding: 12px; position: relative; box-shadow: inset 0 0 30px rgba(0,0,0,0.9);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #94a3b8;">
+                                    <span id="cxrDicomId">DICOM: CXR-PA-4092</span>
+                                    <span id="cxrViewType">POSTEROANTERIOR (PA)</span>
+                                </div>
+
+                                <!-- Canvas Stage with Layered Heatmap & Scanner Reticle -->
+                                <div style="position: relative; width: 100%; height: 320px; background: #000; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                                    <!-- Base X-Ray Canvas -->
+                                    <canvas id="cxrBaseCanvas" width="360" height="320" style="position: absolute; inset: 0; width: 100%; height: 100%;"></canvas>
+                                    <!-- Grad-CAM Heatmap Overlay Canvas -->
+                                    <canvas id="cxrHeatmapCanvas" width="360" height="320" style="position: absolute; inset: 0; width: 100%; height: 100%; mix-blend-mode: screen; pointer-events: none;"></canvas>
+                                    <!-- Bounding Box Annotation Layer -->
+                                    <canvas id="cxrAnnotationCanvas" width="360" height="320" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;"></canvas>
+                                    
+                                    <!-- Laser Inference Scanline Animation -->
+                                    <div id="cxrScanline" style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, transparent, #38bdf8, #00f0ff, transparent); box-shadow: 0 0 12px #38bdf8; display: none;"></div>
+
+                                    <!-- Processing Spinner Badge -->
+                                    <div id="cxrProcessingBadge" style="position: absolute; display: none; align-items: center; gap: 8px; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(12px); padding: 8px 16px; border-radius: 9999px; border: 1px solid #38bdf8; color: #38bdf8; font-size: 0.78rem; font-weight: 700;">
+                                        <i class="fas fa-circle-notch fa-spin"></i> Neural Grad-CAM In Progress...
+                                    </div>
+                                </div>
+
+                                <!-- Heatmap Controls Bar (Opacity & Toggles) -->
+                                <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.74rem; color: #cbd5e1;">
+                                        <span><i class="fas fa-fire" style="color: #ef4444; margin-right: 4px;"></i> Heatmap Opacity:</span>
+                                        <span id="cxrOpacityVal" style="font-family: 'JetBrains Mono'; font-weight: 700; color: #38bdf8;">75%</span>
+                                    </div>
+                                    <input type="range" id="cxrHeatmapOpacity" min="0" max="100" value="75" oninput="updateXRayHeatmapOpacity(this.value)" style="width: 100%; accent-color: #0ea5e9;">
+                                    
+                                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-top: 4px;">
+                                        <button type="button" class="btn btn-sm btn-outline" id="cxrToggleBoxesBtn" onclick="toggleXRayBoundingBoxes()" style="font-size: 0.68rem; padding: 3px 8px;">
+                                            <i class="fas fa-vector-square"></i> Bounding Box
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline" id="cxrInvertBtn" onclick="toggleXRayInvert()" style="font-size: 0.68rem; padding: 3px 8px;">
+                                            <i class="fas fa-circle-half-stroke"></i> Invert L/D
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline" onclick="resetXRayView()" style="font-size: 0.68rem; padding: 3px 8px;">
+                                            <i class="fas fa-rotate-left"></i> Reset
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right: AI Neural Diagnostic Predictions & Clinical Triage Matrix -->
+                            <div style="display: flex; flex-direction: column; gap: 14px;">
+                                <!-- Primary Clinical Finding Card -->
+                                <div id="cxrPrimaryFindingCard" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 12px; padding: 14px 18px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <i class="fas fa-triangle-exclamation" style="color: #ef4444; font-size: 1.1rem;"></i>
+                                            <strong id="cxrPrimaryFindingTitle" style="font-size: 1rem; color: #ffffff;">Pathology Detected: Right Lower Lobe Pneumonia</strong>
+                                        </div>
+                                        <span id="cxrPrimaryConfidenceBadge" class="badge badge-danger" style="font-size: 0.85rem; font-family: 'JetBrains Mono';">95.4% Confidence</span>
+                                    </div>
+                                    <p id="cxrPrimaryFindingDesc" style="color: #cbd5e1; font-size: 0.82rem; margin: 8px 0 0 0; line-height: 1.45;">
+                                        Dense alveolar consolidation with air bronchograms localized to the right paracardiac and basal lung field. No visible tension pneumothorax.
+                                    </p>
+                                </div>
+
+                                <!-- Deep Neural Multi-Label Classification Breakdown -->
+                                <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 14px 18px;">
+                                    <h4 style="margin: 0 0 12px 0; font-size: 0.84rem; text-transform: uppercase; letter-spacing: 0.6px; color: #94a3b8;">
+                                        <i class="fas fa-chart-column" style="color: #38bdf8; margin-right: 6px;"></i> Deep Learning Multi-Label Output (ResNet-101 / DenseNet-121)
+                                    </h4>
+                                    
+                                    <div style="display: flex; flex-direction: column; gap: 10px;" id="cxrProbabilityBars">
+                                        <!-- Injected dynamically by JS -->
+                                    </div>
+                                </div>
+
+                                <!-- Clinical Triage & Pharmacotherapy Advice -->
+                                <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 12px; padding: 14px 18px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                        <span style="font-size: 0.78rem; font-weight: 700; color: #38bdf8;"><i class="fas fa-stethoscope"></i> Automated Clinical Triage Recommendation</span>
+                                        <span id="cxrTriagePriorityPill" class="badge badge-warning">ESI Priority 2: Emergent</span>
+                                    </div>
+                                    <div id="cxrClinicalAdvice" style="font-size: 0.80rem; color: #e2e8f0; line-height: 1.45;">
+                                        1. Immediate supplemental O2 titration targeting SpO2 &gt; 94%.<br>
+                                        2. Initiate IV Ceftriaxone 1g + Azithromycin 500mg empirical therapy.<br>
+                                        3. Stat Arterial Blood Gas (ABG) &amp; Blood Cultures before antimicrobial administration.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lab Test Orders Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> Diagnostic Test Queue</h3>
+                        <span class="badge badge-info" id="labOrdersCount">0 Tests</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table" id="labTestsTable">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Patient</th>
+                                    <th>Requesting Physician</th>
+                                    <th>Test & Category</th>
+                                    <th>Specimen</th>
+                                    <th>Priority</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="labTestsTableBody">
+                                <!-- Populated dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="empty-state" id="labEmptyState" style="display:none; text-align: center; padding: 40px;">
+                        <i class="fas fa-flask" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 12px; display: block;"></i>
+                        <p style="color: var(--text-secondary);">No diagnostic lab tests found matching current filters.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL: Order New Lab Test -->
+    <div class="modal-overlay" id="orderLabTestModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-flask" style="color:var(--primary);"></i> Order Diagnostic Lab Test</h3>
+                <button class="modal-close" onclick="closeModal('orderLabTestModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="orderLabTestForm" onsubmit="event.preventDefault(); saveLabTestOrder();">
+                    <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                        <div class="form-group">
+                            <label class="form-label" for="labPatientSelect">Select Patient *</label>
+                            <select class="form-control" id="labPatientSelect" required>
+                                <option value="">-- Choose Patient --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="labDoctorSelect">Requesting Physician *</label>
+                            <select class="form-control" id="labDoctorSelect" required>
+                                <option value="">-- Choose Doctor --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px;">
+                        <div class="form-group">
+                            <label class="form-label" for="labTestName">Test / Investigation *</label>
+                            <select class="form-control" id="labTestName" required onchange="handleTestTemplateSelect(this.value)">
+                                <option value="">-- Select Diagnostic Panel --</option>
+                                <option value="Complete Blood Count (CBC)">Complete Blood Count (CBC) [Hematology]</option>
+                                <option value="HbA1c & Fasting Blood Sugar">HbA1c & Fasting Blood Sugar [Biochemistry]</option>
+                                <option value="Lipid Profile Comprehensive">Lipid Profile Comprehensive [Biochemistry]</option>
+                                <option value="Cardiac High-Sensitivity Troponin I">Cardiac Troponin I (STAT) [Cardiology]</option>
+                                <option value="Dengue NS1 Antigen & Platelet Count">Dengue NS1 Antigen & Platelets [Serology]</option>
+                                <option value="Renal Function Test (RFT / KFT)">Renal Function Test (BUN / Creatinine) [Biochemistry]</option>
+                                <option value="Liver Function Test (LFT)">Liver Function Test [Biochemistry]</option>
+                                <option value="Digital X-Ray">Digital X-Ray [Radiology]</option>
+                                <option value="3T MRI Brain with Contrast">3T MRI Brain Scan [Neuro Radiology]</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="labSpecimen">Specimen Type</label>
+                            <input type="text" class="form-control" id="labSpecimen" placeholder="e.g. Venous Blood, Serum, Urine" value="Venous Blood">
+                        </div>
+                    </div>
+
+                    <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px;">
+                        <div class="form-group">
+                            <label class="form-label" for="labPriority">Priority Level *</label>
+                            <select class="form-control" id="labPriority" required>
+                                <option value="Routine">Routine</option>
+                                <option value="Urgent">Urgent</option>
+                                <option value="STAT">STAT / Emergency Triage</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="labCategory">Category</label>
+                            <input type="text" class="form-control" id="labCategory" placeholder="e.g. Hematology, Biochemistry" value="Biochemistry">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 10px;">
+                        <label class="form-label" for="labClinicalNotes">Clinical Indication & Notes</label>
+                        <textarea class="form-control" id="labClinicalNotes" rows="2" placeholder="Clinical history, symptoms, or specific markers to evaluate..."></textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                        <button type="button" class="btn btn-outline" onclick="closeModal('orderLabTestModal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Submit Test Order</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Enter Lab Diagnostic Results -->
+    <div class="modal-overlay" id="enterLabResultsModal">
+        <div class="modal-content" style="max-width: 680px;">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-microscope" style="color:var(--primary);"></i> Enter Diagnostic Test Results</h3>
+                <button class="modal-close" onclick="closeModal('enterLabResultsModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="labResultOrderHeader" style="margin-bottom: 16px; padding: 12px; background: rgba(56, 189, 248, 0.08); border-radius: 8px; border: 1px solid rgba(56, 189, 248, 0.2);">
+                    <!-- Populated by JS -->
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">Measured Parameters & Findings</h4>
+                    <button type="button" class="btn btn-sm btn-outline" onclick="addLabParamRow()">
+                        <i class="fas fa-plus"></i> Add Parameter
+                    </button>
+                </div>
+
+                <div id="labParamsContainer" style="display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; padding-right: 4px;">
+                    <!-- Parameter rows injected here -->
+                </div>
+
+                <div class="form-group" style="margin-top: 14px;">
+                    <label class="form-label" for="labPathologistImpression">Clinical Pathologist Impression / Remarks</label>
+                    <textarea class="form-control" id="labPathologistImpression" rows="2" placeholder="Diagnostic conclusions, critical value communications, or follow-up suggestions..."></textarea>
+                </div>
+
+                <div class="form-group" style="margin-top: 10px;">
+                    <label class="form-label" for="labStatusUpdate">Update Test Status</label>
+                    <select class="form-control" id="labStatusUpdate">
+                        <option value="In Progress">In Progress (Specimen Processing)</option>
+                        <option value="Completed" selected>Completed & Clinically Verified</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('enterLabResultsModal')">Cancel</button>
+                    <button type="button" class="btn btn-success" onclick="saveLabResults()"><i class="fas fa-save"></i> Save & Verify Report</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: View Official Glassmorphic Diagnostic Report -->
+    <div class="modal-overlay" id="viewLabReportModal">
+        <div class="modal-content" style="max-width: 800px; padding: 0;">
+            <div class="modal-header" style="padding: 16px 24px; border-bottom: 1px solid var(--glass-border);">
+                <h3 class="modal-title"><i class="fas fa-file-medical" style="color:var(--primary);"></i> Official Diagnostic Pathology Report</h3>
+                <div style="display:flex; gap:10px; align-items:center; flex-shrink:0;">
+                    <button class="btn btn-sm btn-primary" onclick="printLabReport()"><i class="fas fa-print"></i> Print Official Report</button>
+                    <button class="modal-close" onclick="closeModal('viewLabReportModal')">&times;</button>
+                </div>
+            </div>
+            <div class="modal-body" style="padding: 24px; max-height: 80vh; overflow-y: auto;" id="printableLabReportContent">
+                <!-- Injected dynamically by JS -->
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+    <script src="js/react-components.bundle.js"></script>
+    <script src="js/app.js?v=9.2"></script>
+</body>
+</html>

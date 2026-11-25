@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="alternate icon" href="favicon.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediCare HMS - Patient Directory & ABHA Health Card</title>
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css?v=9.2">
+</head>
+<body>
+    <div class="ambient-background">
+        <canvas id="liveWallpaperCanvas"></canvas>
+        <div class="ambient-orb orb-1"></div>
+        <div class="ambient-orb orb-2"></div>
+        <div class="ambient-orb orb-3"></div>
+        <div class="ambient-grid"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-hospital brand-icon"></i>
+                <h2>MediCare HMS</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
+                <a href="emergency.html" class="nav-item" style="color: #ef4444;"><i class="fas fa-truck-medical" style="color: #ef4444;"></i><span>Emergency / ICU</span></a>
+                <a href="telemedicine.html" class="nav-item" style="color: #38bdf8;"><i class="fas fa-video" style="color: #38bdf8;"></i><span>Telemedicine</span></a>
+                <a href="blood-bank.html" class="nav-item" style="color: #f43f5e;"><i class="fas fa-hand-holding-droplet" style="color: #f43f5e;"></i><span>Blood Bank</span></a>
+                <a href="patients.html" class="nav-item active"><i class="fas fa-user-injured"></i><span>Patients</span></a>
+                <a href="doctors.html" class="nav-item"><i class="fas fa-user-md"></i><span>Doctors</span></a>
+                <a href="appointments.html" class="nav-item"><i class="fas fa-calendar-check"></i><span>Appointments</span></a>
+                <a href="prescriptions.html" class="nav-item"><i class="fas fa-prescription"></i><span>Prescriptions</span></a>
+                <a href="laboratory.html" class="nav-item"><i class="fas fa-flask"></i><span>Laboratory</span></a>
+                <a href="pharmacy.html" class="nav-item"><i class="fas fa-pills"></i><span>Pharmacy</span></a>
+                <a href="billing.html" class="nav-item"><i class="fas fa-file-invoice-dollar"></i><span>Billing</span></a>
+                <a href="admin.html" class="nav-item"><i class="fas fa-cogs"></i><span>Administration</span></a>
+                <a href="patient-portal.html" class="nav-item" style="color: #38bdf8;"><i class="fas fa-id-badge" style="color: #38bdf8;"></i><span>Patient Portal</span></a>
+                <a href="slides.html" target="_blank" class="nav-item" style="color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.25); background: rgba(56, 189, 248, 0.08);"><i class="fas fa-file-powerpoint" style="color: #38bdf8;"></i><span>Presentation</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="index.html" class="nav-item"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header HUD -->
+            <header class="header">
+                <div class="header-left">
+                    <button class="btn-icon sidebar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar"><i class="fas fa-bars"></i></button>
+                    <div>
+                        <h1 style="font-size: 1.35rem; font-weight: 700;">Patient Registry & ABHA Digital Health</h1>
+                        <span style="font-size: 0.76rem; color: var(--text-muted); font-family: 'JetBrains Mono';">Ayushman Bharat Digital Mission (ABDM) • Clinical EHR Profiles</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="header-search-pill" onclick="toggleCommandPalette(true)" title="Universal Search & Actions (Ctrl + K)">
+                        <i class="fas fa-search" style="font-size: 0.8rem; color: var(--primary);"></i>
+                        <span>Search</span>
+                        <kbd>Ctrl K</kbd>
+                    </div>
+                    <div class="live-emergency-ticker">
+                        <i class="fas fa-id-card"></i> <span>ABDM: CONNECTED</span>
+                    </div>
+                    <div class="live-clock-widget">
+                        <span class="clock-dot"></span>
+                        <span class="clock-time" id="liveTime">--:--:--</span>
+                        <span style="opacity:0.4;">|</span>
+                        <span class="clock-date" id="liveDate">---</span>
+                    </div>
+                    <button class="btn-icon notification-bell-btn" onclick="toggleNotificationCenter()" title="Notifications & Clinical Alerts"><i class="fas fa-bell"></i></button>
+                    <button class="btn-icon sound-toggle" onclick="toggleSound()" title="Toggle Audio Feedback"><i class="fas fa-volume-up"></i></button>
+                    <button class="btn-icon wallpaper-toggle" onclick="cycleWallpaperMode()" title="Switch Interactive Live Wallpaper"><i class="fas fa-magic"></i></button>
+                    <button class="btn-icon theme-toggle" onclick="toggleTheme()" title="Switch Glass Theme"><i class="fas fa-moon"></i></button>
+                    <!-- React 18 Architecture Badge Mount -->
+                    <div id="react-badge-mount"></div>
+                    <div class="user-info">
+                        <img src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22128%22%20height%3D%22128%22%20viewBox%3D%220%200%20128%20128%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230284c7%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230f172a%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22128%22%20height%3D%22128%22%20rx%3D%2228%22%20fill%3D%22url(%23g)%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2254%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20fill%3D%22%23ffffff%22%20font-family%3D%22system-ui%2Csans-serif%22%20font-size%3D%2248%22%20font-weight%3D%22800%22%3EAD%3C%2Ftext%3E%3C%2Fsvg%3E" alt="User Avatar" class="avatar">
+                        <div>
+                            <strong>Dr. Admin</strong>
+                            <span>Super User</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <!-- Actions Bar -->
+                <div class="actions-bar" style="flex-wrap: wrap; gap: 12px;">
+                    <div class="search-box" style="flex: 1; min-width: 260px;">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="patientSearch" placeholder="Search patients by name, ID, phone, condition..." oninput="filterPatients()">
+                    </div>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn btn-outline" onclick="exportPatientsToCSV()" title="Export Patients Directory to CSV">
+                            <i class="fas fa-file-csv"></i> Export CSV
+                        </button>
+                        <button class="btn btn-outline" onclick="openAbhaGeneratorForActive()" style="border-color: #38bdf8; color: #38bdf8;">
+                            <i class="fas fa-id-card"></i> Generate ABHA Digital Card
+                        </button>
+                        <button class="btn btn-primary" onclick="showAddPatientModal()">
+                            <i class="fas fa-user-plus"></i> Register New Patient
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Patient Table Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-procedures" style="color:var(--primary);"></i> Inpatient & Outpatient Records</h3>
+                        <span class="badge badge-info" id="patientCount">0 Patients Recorded</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table" id="patientsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Patient ID</th>
+                                        <th>Full Name</th>
+                                        <th>Age / Gender</th>
+                                        <th>Blood</th>
+                                        <th>Contact Phone</th>
+                                        <th>Primary Diagnosis</th>
+                                        <th>Care Status</th>
+                                        <th>ABHA Health ID</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="patientsTableBody">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="empty-state" id="patientsEmpty" style="display:none;">
+                            <i class="fas fa-user-slash"></i>
+                            <p>No matching patient records found.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add / Edit Patient Modal -->
+    <div class="modal-overlay" id="patientModal" style="display:none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="patientModalTitle">Register New Patient</h3>
+                <button class="btn-icon" onclick="closeModal('patientModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="patientForm" onsubmit="event.preventDefault(); savePatient();">
+                    <input type="hidden" id="editPatientId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" class="form-control" id="patientName" placeholder="e.g. John Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Age *</label>
+                            <input type="number" class="form-control" id="patientAge" placeholder="e.g. 42" min="1" max="120" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Gender *</label>
+                            <select class="form-control form-select" id="patientGender" required>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Blood Group</label>
+                            <select class="form-control form-select" id="patientBloodGroup">
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="O+" selected>O+</option>
+                                <option value="O-">O-</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Phone Number *</label>
+                            <input type="tel" class="form-control" id="patientPhone" placeholder="10-digit mobile number" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="patientEmail" placeholder="patient@example.com">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Residential Address</label>
+                        <textarea class="form-control" id="patientAddress" rows="2" placeholder="Street address, city, state"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Primary Condition / Diagnosis</label>
+                            <input type="text" class="form-control" id="patientCondition" placeholder="e.g. Type-2 Diabetes">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Admission Status</label>
+                            <select class="form-control form-select" id="patientStatus">
+                                <option value="Admitted">Admitted</option>
+                                <option value="Outpatient">Outpatient</option>
+                                <option value="Discharged">Discharged</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="padding-right:0; padding-bottom:0;">
+                        <button type="button" class="btn btn-outline" onclick="closeModal('patientModal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary" onclick="savePatient()">Save Patient Record</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Government-Compliant ABHA Digital Health Card Generator & Viewer -->
+    <div class="modal-overlay" id="abhaCardModal" style="display:none;">
+        <div class="modal" style="max-width: 620px; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(40px); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 24px; padding: 0; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,0.85), 0 0 40px rgba(56,189,248,0.25);">
+            <div class="modal-header no-print" style="padding: 16px 24px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; display: flex; align-items: center; justify-content: center; color: #38bdf8;">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                    <div>
+                        <h3 style="margin: 0; font-size: 1.05rem; color: #fff;">Ayushman Bharat Digital Health ID Card</h3>
+                        <span style="font-size: 0.72rem; color: #94a3b8;">National Health Authority • Government of India (ABDM)</span>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button class="btn btn-sm btn-outline no-print" onclick="toggleAppleWalletPassView()"><i class="fab fa-apple"></i> Apple Wallet</button>
+                    <button class="btn btn-sm btn-primary no-print" onclick="window.print()"><i class="fas fa-print"></i> Print Card</button>
+                    <button class="btn-icon no-print" onclick="closeModal('abhaCardModal')"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+
+            <div class="modal-body" style="padding: 24px;">
+                <!-- Authentic ABHA Card Container -->
+                <div id="abhaCardVisualContainer">
+                    <!-- Dynamically rendered by renderABHACard() in js/app.js -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Apple Wallet Pass Modal -->
+    <div class="modal-overlay" id="appleWalletPassModal" style="display:none;">
+        <div class="modal" style="max-width: 440px; padding: 0; background: transparent; border: none; box-shadow: none;">
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
+                <button class="btn-icon" onclick="closeModal('appleWalletPassModal')" style="background: rgba(0,0,0,0.6); color: #fff; width: 36px; height: 36px;"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="appleWalletPassContent">
+                <!-- Dynamically populated by renderAppleWalletPass() -->
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 14px;">
+                <button class="btn btn-outline" style="flex: 1; background: rgba(0,0,0,0.5); color: #fff;" onclick="closeModal('appleWalletPassModal')">Close</button>
+                <button class="btn btn-primary" style="flex: 1;" onclick="downloadAppleWalletPass(activeAbhaPatientId)"><i class="fas fa-download"></i> Download Pass</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+    <div id="react-assistant-mount"></div>
+    <script src="js/react-components.bundle.js"></script>
+    <script src="js/app.js?v=9.2"></script>
+</body>
+</html>
